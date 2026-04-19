@@ -20,14 +20,13 @@ export async function POST(request: NextRequest) {
     const replicateToken = process.env.REPLICATE_API_TOKEN;
 
     // 1. Create the prediction
-    const createRes = await fetch("https://api.replicate.com/v1/predictions", {
+    const createRes = await fetch("https://api.replicate.com/v1/models/tencent/hunyuan-video/predictions", {
       method: "POST",
       headers: {
         Authorization: `Token ${replicateToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        version: "847dfa8b01e739d6e920a3e3cf29b8b7c764c0a1cef40e6685f6db6faa8dc5df",
         input: {
           prompt: "Cinematic 2-3 second vertical video 9:16, dynamic motion, no text, vibrant colors: " + hook,
           width: 544,
@@ -44,13 +43,13 @@ export async function POST(request: NextRequest) {
     }
 
     const prediction = await createRes.json();
-    const predictionId = prediction.id;
+    const pollUrl = prediction.urls.get;
 
     // 2. Poll the prediction
     let status = prediction.status;
     let outputUrl = null;
     let pollCount = 0;
-    const maxPolls = 20;
+    const maxPolls = 60; // 3 mins max
 
     while (status !== "succeeded" && status !== "failed" && status !== "canceled" && pollCount < maxPolls) {
       pollCount++;
@@ -58,7 +57,7 @@ export async function POST(request: NextRequest) {
       // Wait 3 seconds
       await new Promise(resolve => setTimeout(resolve, 3000));
 
-      const pollRes = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
+      const pollRes = await fetch(pollUrl, {
         headers: {
           Authorization: `Token ${replicateToken}`,
         }
