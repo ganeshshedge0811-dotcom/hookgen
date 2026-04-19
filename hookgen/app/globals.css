@@ -103,6 +103,32 @@ body {
   animation: spin-smooth 1s linear infinite;
 }
 
+/* Animated Gradient Background */
+@keyframes bg-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-bg-shift {
+  background-size: 200% 200%;
+  animation: bg-shift 15s ease infinite;
+}
+
+/* Perspective Utility for Parallax */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
